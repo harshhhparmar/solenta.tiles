@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — Solenta Tiles</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0B0B0C;
+    --porcelain:#EDEAE3;
+    --paper:#FAF9F6;
+    --glaze:#3F9D57;
+    --glaze-deep:#276B3D;
+    --glaze-tint:#DFEFE2;
+    --ember:#E2762E;
+    --stone:#726C60;
+    --line:#D8D4C9;
+    --line-dark:#333331;
+    --radius:2px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--porcelain);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;}
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 24px; }
+
+  header{
+    background:var(--ink);
+    color:var(--paper);
+    padding:20px 0;
+  }
+  .header-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  .brand{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:18px;
+  }
+  .brand span{
+    display:block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:#B7B3A8;
+    margin-top:2px;
+  }
+  .header-actions{ display:flex; align-items:center; gap:16px; }
+  #adminEmail{ font-size:13px; color:#B7B3A8; }
+  #logoutBtn{
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:13px;
+    font-weight:600;
+    background:transparent;
+    color:var(--paper);
+    border:1px solid #565650;
+    border-radius:var(--radius);
+    padding:8px 16px;
+    cursor:pointer;
+    transition:border-color .2s ease;
+  }
+  #logoutBtn:hover{ border-color:var(--paper); }
+
+  main{ padding:40px 0 80px; }
+
+  .toolbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:14px;
+    margin-bottom:24px;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:26px;
+  }
+  .count{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    color:var(--stone);
+  }
+  #refreshBtn{
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:13px;
+    font-weight:600;
+    background:var(--paper);
+    color:var(--ink);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:9px 16px;
+    cursor:pointer;
+  }
+  #refreshBtn:hover{ border-color:var(--stone); }
+
+  .table-wrap{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow-x:auto;
+  }
+  table{ width:100%; border-collapse:collapse; min-width:900px; }
+  th, td{
+    text-align:left;
+    padding:14px 16px;
+    border-bottom:1px solid var(--line);
+    font-size:14px;
+    vertical-align:top;
+  }
+  th{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--stone);
+    background:var(--porcelain);
+    white-space:nowrap;
+  }
+  tr:last-child td{ border-bottom:none; }
+  td.msg-cell{ max-width:280px; white-space:pre-wrap; }
+  td.muted{ color:var(--stone); }
+  .badge{
+    display:inline-block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    padding:2px 8px;
+    border-radius:12px;
+    background:var(--glaze-tint);
+    color:var(--glaze-deep);
+    text-transform:capitalize;
+  }
+  .state{
+    padding:60px 20px;
+    text-align:center;
+    color:var(--stone);
+  }
+  .state.error{ color:#A6431A; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap header-row">
+    <div class="brand">Solenta Tiles<span>Admin Dashboard</span></div>
+    <div class="header-actions">
+      <span id="adminEmail"></span>
+      <button id="logoutBtn">Log out</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="toolbar">
+      <div>
+        <h1>Website Inquiries</h1>
+        <div class="count" id="rowCount"></div>
+      </div>
+      <button id="refreshBtn">Refresh</button>
+    </div>
+
+    <div class="table-wrap">
+      <table id="inquiryTable" style="display:none;">
+        <thead>
+          <tr>
+            <th>Date / Time</th>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Company</th>
+            <th>Product Range</th>
+            <th>Message</th>
+            <th>Source</th>
+          </tr>
+        </thead>
+        <tbody id="inquiryBody"></tbody>
+      </table>
+      <div class="state" id="stateMsg">Loading…</div>
+    </div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+  const SUPABASE_URL = 'https://durvxhvttqbrakvikwfk.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_qP2TTPF5xSKuACUcEIS4ng_n25nZYH9';
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const stateMsg = document.getElementById('stateMsg');
+  const table = document.getElementById('inquiryTable');
+  const tbody = document.getElementById('inquiryBody');
+  const rowCount = document.getElementById('rowCount');
+
+  function escapeHtml(str){
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  function formatDate(iso){
+    try {
+      const d = new Date(iso);
+      return d.toLocaleString('en-IN', {
+        day: '2-digit', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
+    } catch(e){ return iso; }
+  }
+
+  async function loadInquiries(){
+    stateMsg.style.display = 'block';
+    stateMsg.className = 'state';
+    stateMsg.textContent = 'Loading…';
+    table.style.display = 'none';
+
+    const { data, error } = await sb
+      .from('enquiries')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      stateMsg.className = 'state error';
+      stateMsg.textContent = 'Could not load inquiries: ' + error.message;
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      stateMsg.className = 'state';
+      stateMsg.textContent = 'No inquiries yet.';
+      rowCount.textContent = '';
+      return;
+    }
+
+    tbody.innerHTML = data.map(function(row){
+      return '<tr>' +
+        '<td>' + escapeHtml(formatDate(row.created_at)) + '</td>' +
+        '<td>' + escapeHtml(row.name) + '</td>' +
+        '<td>' + escapeHtml(row.phone) + '</td>' +
+        '<td class="' + (row.email ? '' : 'muted') + '">' + escapeHtml(row.email || '—') + '</td>' +
+        '<td class="' + (row.company ? '' : 'muted') + '">' + escapeHtml(row.company || '—') + '</td>' +
+        '<td>' + escapeHtml(row.product_range || '—') + '</td>' +
+        '<td class="msg-cell">' + escapeHtml(row.message || '—') + '</td>' +
+        '<td><span class="badge">' + escapeHtml(row.source || '—') + '</span></td>' +
+        '</tr>';
+    }).join('');
+
+    rowCount.textContent = data.length + (data.length === 1 ? ' inquiry' : ' inquiries');
+    stateMsg.style.display = 'none';
+    table.style.display = 'table';
+  }
+
+  async function protectRoute(){
+    const { data } = await sb.auth.getSession();
+    if (!data || !data.session) {
+      window.location.href = 'admin-login.html';
+      return false;
+    }
+    // Only one admin account can ever exist (see admin-login.html and the
+    // Supabase RLS policies) — so any valid session here is the admin.
+    document.getElementById('adminEmail').textContent = data.session.user.email;
+    return true;
+  }
+
+  sb.auth.onAuthStateChange(function(event){
+    if (event === 'SIGNED_OUT') {
+      window.location.href = 'admin-login.html';
+    }
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', async function(){
+    await sb.auth.signOut();
+    window.location.href = 'admin-login.html';
+  });
+
+  document.getElementById('refreshBtn').addEventListener('click', loadInquiries);
+
+  (async function init(){
+    const ok = await protectRoute();
+    if (ok) loadInquiries();
+  })();
+</script>
+</body>
+</html>
